@@ -46,7 +46,7 @@ namespace DemoAPI.Controllers
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect//api/core/v1/Demographics/All");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
-            request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMwODI1ODYxLjB9.FbzBUmkI5zuHN8X4jNZbzHq1ctArK-n4Cz0mjc_XH5jvRywCNR6N8-CQ7nzKQZxi1glRMF_TgJo1u-R9M7UNOgZCO2gZD8_koVHsjVX_-NA4U5E5-InS-MOD0IR16VCU1mqitQ_w65mN5cJCCx4_6lVyDYcQxZU-1NM1LnS8S2M");
+            request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMxMTAwMjAyLjB9.MbWjtlDG6pEbalCcPPhhovGO2nIZ3AP4S6WNoEw0PSAEMACl1ekrA_tpdYDRVZMqLjGru27uwRIHGqzLR2yi3m6pg-JYtA7ylGMYXT-iIs73zS924HKPBH2ZTraHxCy04K1quwiWff-6lVyrBuZH-oP816wcYW8JF8vXDb9wrMY");
             //request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
