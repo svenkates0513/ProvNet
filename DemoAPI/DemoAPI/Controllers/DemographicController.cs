@@ -46,7 +46,7 @@ namespace DemoAPI.Controllers
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect//api/core/v1/Demographics/All");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
-            request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMxMTAwMjAyLjB9.MbWjtlDG6pEbalCcPPhhovGO2nIZ3AP4S6WNoEw0PSAEMACl1ekrA_tpdYDRVZMqLjGru27uwRIHGqzLR2yi3m6pg-JYtA7ylGMYXT-iIs73zS924HKPBH2ZTraHxCy04K1quwiWff-6lVyrBuZH-oP816wcYW8JF8vXDb9wrMY");
+            request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMxNzc0NjI2LjB9.ZbEJgQAbp5TUfySsBxqO9nVld_-u5Ea6_6dCzwpfBvveJVA21R76wZWrdL1VGDHuk9_zkLW9bf05QqtTUWpLs07cu4ijOhV8Up6L3RUlaXz2gC7ALjlH9ykKEDRhrd3RWjkPeTorR3zTzH7yQV4ZGgo0PwNhq4-XRBFFjG_iNOs");
             //request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
@@ -116,7 +116,7 @@ namespace DemoAPI.Controllers
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
-                using (SqlCommand cmd = new SqlCommand("sp_InsertOrUpdateDempgraphic", conn))
+                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDempgraphic", conn))
                 {                    
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
