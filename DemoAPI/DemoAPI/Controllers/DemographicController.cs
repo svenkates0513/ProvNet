@@ -20,17 +20,17 @@ namespace DemoAPI.Controllers
         private readonly Logger _logger = new Logger();
 
         //API Authentication Service
-        //private readonly HttpClient _client;
-        //private readonly TokenService _tokenService;
+        private readonly HttpClient _client;
+        private readonly TokenService _tokenService;
 
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        //public DemographicController(HttpClient client, TokenService tokenService)
-        //{
-        //    _client = client;
-        //    _tokenService = tokenService;
-        //}
+        public DemographicController(HttpClient client, TokenService tokenService)
+        {
+            _client = client;
+            _tokenService = tokenService;
+        }
 
         // Create an action method to handle API calls
         [HttpPost("fetch-data")]
@@ -40,14 +40,14 @@ namespace DemoAPI.Controllers
             var client = new HttpClient();
 
             // Get the dynamic bearer token
-            //string bearerToken = await _tokenService.GetBearerTokenAsync();
+            string bearerToken = await _tokenService.GetBearerTokenAsync();
 
             // Setup the Demographic API request with retrived bearer token
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect//api/core/v1/Demographics/All");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
-            request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMxNzc0NjI2LjB9.ZbEJgQAbp5TUfySsBxqO9nVld_-u5Ea6_6dCzwpfBvveJVA21R76wZWrdL1VGDHuk9_zkLW9bf05QqtTUWpLs07cu4ijOhV8Up6L3RUlaXz2gC7ALjlH9ykKEDRhrd3RWjkPeTorR3zTzH7yQV4ZGgo0PwNhq4-XRBFFjG_iNOs");
-            //request.Headers.Add("Authorization", $"Bearer {bearerToken}");
+            //request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMyMTM3ODg1LjB9.lxCLsS_8ScaRWgtodpadsqDfDI8SzYvQ24LzWB1ZZUs0zTKxLrMRTWatD4hFxeCAlzeUVHYhkYBLsJEN3O2W_-IShcbV_Ld--SGjrJ3RYTsG9a7FGt9kN0SvxCrlse1HHwGTdba5EbcY8r3sJhFzQ4fubkh-cn4LKWJ7CV-Kjf0");
+            request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
             var content = new StringContent("{\"Page\": 1, \"PageSize\": 20}", Encoding.UTF8, "application/json");

@@ -39,7 +39,7 @@ namespace DemoAPI.Services
             };
 
             string jsonBody = JsonSerializer.Serialize(body);
-            var content = new StringContent("{}", Encoding.UTF8, "application/json");
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
             request.Content = content;
 
             //Send the request

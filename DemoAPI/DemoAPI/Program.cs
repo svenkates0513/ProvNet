@@ -7,7 +7,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(); //Register HttpClient
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddScoped<TokenService>(); //Register TokenService
+builder.Services.AddControllers();
+builder.Services.AddScoped<TokenService>(); //Register TokenService
 
 var app = builder.Build();
 
