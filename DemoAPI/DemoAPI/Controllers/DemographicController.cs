@@ -50,7 +50,7 @@ namespace DemoAPI.Controllers
             request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
-            var content = new StringContent("{\"Page\": 1, \"PageSize\": 20}", Encoding.UTF8, "application/json");
+            var content = new StringContent("{\"Page\": 1, \"PageSize\": 300}", Encoding.UTF8, "application/json");
 
             request.Content = content;
 

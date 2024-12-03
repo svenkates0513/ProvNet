@@ -14,7 +14,7 @@ namespace DemoAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OrganizationsController : ControllerBase
+    public class DemographicOfficesLocationsController : ControllerBase
     {
         //Logger Helper
         private readonly Logger _logger = new Logger();
@@ -26,7 +26,7 @@ namespace DemoAPI.Controllers
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        public OrganizationsController(HttpClient client, TokenService tokenService)
+        public DemographicOfficesLocationsController(HttpClient client, TokenService tokenService)
         {
             _client = client;
             _tokenService = tokenService;
@@ -43,14 +43,14 @@ namespace DemoAPI.Controllers
             string bearerToken = await _tokenService.GetBearerTokenAsync();
 
             // Setup the Demographic API request with retrived bearer token
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect/api/core/v1/organizations/all");
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect/api/core/v1/Demographic/OfficesLocations/All");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
             //request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMyMTM3ODg1LjB9.lxCLsS_8ScaRWgtodpadsqDfDI8SzYvQ24LzWB1ZZUs0zTKxLrMRTWatD4hFxeCAlzeUVHYhkYBLsJEN3O2W_-IShcbV_Ld--SGjrJ3RYTsG9a7FGt9kN0SvxCrlse1HHwGTdba5EbcY8r3sJhFzQ4fubkh-cn4LKWJ7CV-Kjf0");
             request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
-            var content = new StringContent("{\"Page\": 1, \"PageSize\": 300}", Encoding.UTF8, "application/json"); 
+            var content = new StringContent("{\"Page\": 1, \"PageSize\": 300}", Encoding.UTF8, "application/json");
 
             request.Content = content;
 
@@ -87,15 +87,15 @@ namespace DemoAPI.Controllers
                 }
 
                 //Deserialize JSON response to Demographic object using Newtonsoft.Json
-                List<Organizations> organizations = JsonConvert.DeserializeObject<List<Organizations>>(resultArray.ToString());
+                List<DemographicsOfficesLocations> demographicsOfficesLocations = JsonConvert.DeserializeObject<List<DemographicsOfficesLocations>>(resultArray.ToString());
 
                 //Insert/Update each demographics record in the database
-                foreach (var organization in organizations)
+                foreach (var demographicsOfficesLocation in demographicsOfficesLocations)
                 {
-                    await InsertOrUpdateOrganization(organization);
+                    await InsertOrUpdateDemographicsOfficesLocations(demographicsOfficesLocation);
                 }
 
-                return Ok(new { message = "Data fetched and inserted/updated successfuly", data = organizations });
+                return Ok(new { message = "Data fetched and inserted/updated successfuly", data = demographicsOfficesLocations });
             }
 
             catch (HttpRequestException httpRequestException)
@@ -107,7 +107,7 @@ namespace DemoAPI.Controllers
         }
 
         // Method to call Store Procedure
-        private async Task InsertOrUpdateOrganization(Organizations organizations)
+        private async Task InsertOrUpdateDemographicsOfficesLocations(DemographicsOfficesLocations demographicsOfficesLocations)
         {
             await _logger.LogAsync("Starting DB operation...");
 
@@ -116,7 +116,7 @@ namespace DemoAPI.Controllers
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
-                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateOrganization", conn))
+                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographicsOfficesLocations", conn))
                 {
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -125,44 +125,33 @@ namespace DemoAPI.Controllers
                     await _logger.LogAsync($"Executing stored procedure: {cmd.CommandText}");
 
                     //Paramters to the store procedure
-                    cmd.Parameters.AddWithValue("@Id", (object)organizations.id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Dr_Id", (object)organizations.dr_Id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ExternalId", (object)organizations.externalId ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Location_Id", (object)organizations.location_Id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Name", (object)organizations.name ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@SiteType_Code", (object)organizations.siteType_Code ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Status_Code", (object)organizations.status_Code ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@DoingBusinessAs", (object)organizations.doingBusinessAs ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@OtherName", (object)organizations.otherName ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@DisplayOtherName", (object)organizations.displayOtherName ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@HandicapAccess", (object)organizations.handicapAccess ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@PublicTransportation", (object)organizations.publicTransportation ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@HideFromHub", (object)organizations.hideFromHub ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@LocationAddresses_Id", (object)organizations.locationAddresses_Id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@AddressLine1", (object)organizations.addressLine1 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@AddressLine2", (object)organizations.addressLine2 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@City", (object)organizations.city ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@State", (object)organizations.state ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Zip", (object)organizations.zip ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Ext1", (object)organizations.ext1 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Phone1", (object)organizations.phone1 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Phone2", (object)organizations.phone2 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Ext2", (object)organizations.ext2 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Fax", (object)organizations.fax ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Email", (object)organizations.email ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Country", (object)organizations.country ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@TaxID", (object)organizations.taxID ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@GroupNPI", (object)organizations.groupNPI ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@GroupPTAN", (object)organizations.groupPTAN ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@MedicaidNumber", (object)organizations.medicaidNumber ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@MedicareNumber", (object)organizations.medicareNumber ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@County", (object)organizations.county ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Id", (object)demographicsOfficesLocations.Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Dr_Id", (object)demographicsOfficesLocations.Dr_Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Location_Id", (object)demographicsOfficesLocations.Location_Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Status_Code", (object)demographicsOfficesLocations.Status_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Facility_Code", (object)demographicsOfficesLocations.Facility_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@EffectiveDate", (object)demographicsOfficesLocations.EffectiveDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TerminationDate", (object)demographicsOfficesLocations.TerminationDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@AcceptsNewPatients", (object)demographicsOfficesLocations.AcceptsNewPatients ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@HideFromHub", (object)demographicsOfficesLocations.HideFromHub ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IncludeInDirectory", (object)demographicsOfficesLocations.IncludeInDirectory ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DirectMessagingAddress", (object)demographicsOfficesLocations.DirectMessagingAddress ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Telehealth", (object)demographicsOfficesLocations.Telehealth ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PCPSpecialty", (object)demographicsOfficesLocations.PCPSpecialty ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Phone", (object)demographicsOfficesLocations.Phone ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Extension", (object)demographicsOfficesLocations.Extension ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Phone2", (object)demographicsOfficesLocations.Phone2 ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Extension2", (object)demographicsOfficesLocations.Extension2 ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Fax", (object)demographicsOfficesLocations.Fax ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Email", (object)demographicsOfficesLocations.Email ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Sequence", (object)demographicsOfficesLocations.Sequence ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Comment", (object)demographicsOfficesLocations.Comment ?? DBNull.Value);
 
                     // Log each parameter value
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //{
-                    //    await _logger.LogAsync($"Parameter {param.ParameterName}: {param.Value}");
-                    //}
+                    foreach (SqlParameter param in cmd.Parameters)
+                    {
+                        await _logger.LogAsync($"Parameter {param.ParameterName}: {param.Value}");
+                    }
 
                     //Execute the command and log the result
                     try
