@@ -14,7 +14,7 @@ namespace DemoAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OrganizationsController : ControllerBase
+    public class OrganizationController : ControllerBase
     {
         //Logger Helper
         private readonly Logger _logger = new Logger();
@@ -26,7 +26,7 @@ namespace DemoAPI.Controllers
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        public OrganizationsController(HttpClient client, TokenService tokenService)
+        public OrganizationController(HttpClient client, TokenService tokenService)
         {
             _client = client;
             _tokenService = tokenService;

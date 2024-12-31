@@ -116,7 +116,7 @@ namespace DemoAPI.Controllers
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
-                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemopgraphic", conn))
+                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographic", conn))
                 {                    
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;

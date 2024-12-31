@@ -14,7 +14,7 @@ namespace DemoAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DemographicOfficesLocationsController : ControllerBase
+    public class DemographicOfficeLocationController : ControllerBase
     {
         //Logger Helper
         private readonly Logger _logger = new Logger();
@@ -26,7 +26,7 @@ namespace DemoAPI.Controllers
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        public DemographicOfficesLocationsController(HttpClient client, TokenService tokenService)
+        public DemographicOfficeLocationController(HttpClient client, TokenService tokenService)
         {
             _client = client;
             _tokenService = tokenService;
@@ -116,7 +116,7 @@ namespace DemoAPI.Controllers
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
-                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographicsOfficesLocations", conn))
+                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographicOfficeLocation", conn))
                 {
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
