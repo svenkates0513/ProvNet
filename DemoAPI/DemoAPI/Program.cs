@@ -9,6 +9,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<TokenService>(); //Register TokenService
+//builder.Services.AddSingleton<IValidationLogic, ValidationLogic>();
+//builder.Services.AddSingleton<ISqlService, SqlService>();
+//builder.Services.AddSingleton<ILocationApiService, LocationApiService>();
+builder.Services.AddSingleton<AddressValidateService>();
 
 var app = builder.Build();
 

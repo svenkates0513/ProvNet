@@ -19,17 +19,21 @@ namespace DemoAPI.Controllers
         //Logger Helper
         private readonly Logger _logger = new Logger();
 
-        //API Authentication Service
+        //API Authentication Service (TokenService)
         private readonly HttpClient _client;
         private readonly TokenService _tokenService;
+
+        //AddressValidationService
+        private readonly AddressValidateService _addressValidateService;
 
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        public LocationAddressController(HttpClient client, TokenService tokenService)
+        public LocationAddressController(HttpClient client, TokenService tokenService, AddressValidateService addressValidateService)
         {
             _client = client;
             _tokenService = tokenService;
+            _addressValidateService = addressValidateService;
         }
 
         // Create an action method to handle API calls
@@ -42,11 +46,10 @@ namespace DemoAPI.Controllers
             // Get the dynamic bearer token
             string bearerToken = await _tokenService.GetBearerTokenAsync();
 
-            // Setup the Demographic API request with retrived bearer token
+            // Setup the Loacation Address API request with retrived bearer token
             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect/api/Core/v1/Lookup/LocationAddresses/All");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
-            //request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMyMTM3ODg1LjB9.lxCLsS_8ScaRWgtodpadsqDfDI8SzYvQ24LzWB1ZZUs0zTKxLrMRTWatD4hFxeCAlzeUVHYhkYBLsJEN3O2W_-IShcbV_Ld--SGjrJ3RYTsG9a7FGt9kN0SvxCrlse1HHwGTdba5EbcY8r3sJhFzQ4fubkh-cn4LKWJ7CV-Kjf0");
             request.Headers.Add("Authorization", $"Bearer {bearerToken}");
 
             //Define the content to send in the POST request
@@ -56,13 +59,7 @@ namespace DemoAPI.Controllers
 
             try
             {
-                //Log request details
-                //await _logger.LogAsync($"Request URI: {request.RequestUri}");
-                //await _logger.LogAsync($"Request Headers: {request.Headers}");
-                //await _logger.LogAsync($"Request Content: {await request.Content.ReadAsStringAsync()}");
-
                 //Send the request to the external API
-                //var response = await _client.SendAsync(request);
                 var response = await client.SendAsync(request);
 
                 //Check if the request was successful
@@ -72,8 +69,8 @@ namespace DemoAPI.Controllers
                 var responseData = await response.Content.ReadAsStringAsync();
 
                 //Log the full response content
-                await _logger.LogAsync($"API Response:");
-                await _logger.LogAsync(responseData);
+                //await _logger.LogAsync($"API Response:");
+                //await _logger.LogAsync(responseData);
 
                 //Parse the root JSON object to extract the Result array
                 JObject root = JObject.Parse(responseData);
@@ -95,6 +92,9 @@ namespace DemoAPI.Controllers
                     await InsertOrUpdateLocationAddress(locationAddresses);
                 }
 
+                //Trigger the validation service
+               // await _addressValidateService.RunValidationAsync();
+
                 return Ok(new { message = "Data fetched and inserted/updated successfuly", data = locationAddress });
             }
 
@@ -109,16 +109,18 @@ namespace DemoAPI.Controllers
         // Method to call Store Procedure
         private async Task InsertOrUpdateLocationAddress(LocationAddress locationAddress)
         {
+            //Log the process
             await _logger.LogAsync("Starting DB operation...");
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                //Open the contention and Log it in Logger
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
                 using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateLocationAddress", conn))
                 {
-
+                    //Open SP-uspInsertOrUpdateLocationAddress and run with value
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                     //Log the command text and eah parameter
@@ -146,10 +148,10 @@ namespace DemoAPI.Controllers
                     cmd.Parameters.AddWithValue("@County", (object)locationAddress.County ?? DBNull.Value);
 
                     // Log each parameter value
-                    foreach (SqlParameter param in cmd.Parameters)
-                    {
-                        await _logger.LogAsync($"Parameter {param.ParameterName}: {param.Value}");
-                    }
+                    //foreach (SqlParameter param in cmd.Parameters)
+                    //{
+                    //    await _logger.LogAsync($"Parameter {param.ParameterName}: {param.Value}");
+                    //}
 
                     //Execute the command and log the result
                     try
