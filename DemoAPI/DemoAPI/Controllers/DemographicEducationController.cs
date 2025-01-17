@@ -14,7 +14,7 @@ namespace DemoAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DemographicApprovedAssociate : ControllerBase
+    public class DemographicEducationController : ControllerBase
     {
         //Logger Helper
         private readonly Logger _logger = new Logger();
@@ -26,7 +26,7 @@ namespace DemoAPI.Controllers
         //DB Connection
         private readonly string _connectionString = "Server=SQLST19A;Database=ProviderCentral;Integrated Security=True";
 
-        public DemographicApprovedAssociate(HttpClient client, TokenService tokenService)
+        public DemographicEducationController(HttpClient client, TokenService tokenService)
         {
             _client = client;
             _tokenService = tokenService;
@@ -42,8 +42,8 @@ namespace DemoAPI.Controllers
             // Get the dynamic bearer token
             string bearerToken = await _tokenService.GetBearerTokenAsync();
 
-            // Setup the Demographic API request with retrived bearer token
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect/api/core/v1/Demographic/ApprovedAssociates/All");
+            // Setup the Demographic Education API request with retrived bearer token
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://api.veritystream.cloud/services/verityconnect/api/core/v1/Demographic/Education/all");
 
             //Set the Authorization header (replace {{JWT-Token}} with your actual token)
             //request.Headers.Add("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJVc2VySWQiOjE2MzcyLCJSZXNvdXJjZSI6IlZlcml0eSBDb25uZWN0IiwiZXhwIjoxNzMyMTM3ODg1LjB9.lxCLsS_8ScaRWgtodpadsqDfDI8SzYvQ24LzWB1ZZUs0zTKxLrMRTWatD4hFxeCAlzeUVHYhkYBLsJEN3O2W_-IShcbV_Ld--SGjrJ3RYTsG9a7FGt9kN0SvxCrlse1HHwGTdba5EbcY8r3sJhFzQ4fubkh-cn4LKWJ7CV-Kjf0");
@@ -87,15 +87,15 @@ namespace DemoAPI.Controllers
                 }
 
                 //Deserialize JSON response to Demographic object using Newtonsoft.Json
-                List<DemographicApprovedAssociates> demographicApprovedAssociates = JsonConvert.DeserializeObject<List<DemographicApprovedAssociates>>(resultArray.ToString());
+                List<DemographicEducations> demographicEducations = JsonConvert.DeserializeObject<List<DemographicEducations>>(resultArray.ToString());
 
                 //Insert/Update each demographics record in the database
-                foreach (var demographicApprovedAssociate in demographicApprovedAssociates)
+                foreach (var demographicEducation in demographicEducations)
                 {
-                    await InsertOrUpdateDemographicApprovedAssociate(demographicApprovedAssociate);
+                    await InsertOrUpdateDemographicEducation(demographicEducation);
                 }
 
-                return Ok(new { message = "Data fetched and inserted/updated successfuly", data = demographicApprovedAssociates });
+                return Ok(new { message = "Data fetched and inserted/updated successfuly", data = demographicEducations });
             }
 
             catch (HttpRequestException httpRequestException)
@@ -107,7 +107,7 @@ namespace DemoAPI.Controllers
         }
 
         // Method to call Store Procedure
-        private async Task InsertOrUpdateDemographicApprovedAssociate(DemographicApprovedAssociates demographicApprovedAssociates)
+        private async Task InsertOrUpdateDemographicEducation(DemographicEducations demographicEducations)
         {
             await _logger.LogAsync("Starting DB operation...");
 
@@ -116,7 +116,7 @@ namespace DemoAPI.Controllers
                 await conn.OpenAsync();
                 await _logger.LogAsync("SQL COnnection Opened");
 
-                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographicApprovedAssociate", conn))
+                using (SqlCommand cmd = new SqlCommand("uspInsertOrUpdateDemographicEducation", conn))
                 {
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -125,23 +125,31 @@ namespace DemoAPI.Controllers
                     await _logger.LogAsync($"Executing stored procedure: {cmd.CommandText}");
 
                     //Paramters to the store procedure
-                    cmd.Parameters.AddWithValue("@Id", (object)demographicApprovedAssociates.Id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Dr_Id", (object)demographicApprovedAssociates.Dr_Id ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Type_Code", (object)demographicApprovedAssociates.Type_Code ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Facility_Code", (object)demographicApprovedAssociates.Facility_Code ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Name", (object)demographicApprovedAssociates.Name ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Title", (object)demographicApprovedAssociates.Title ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@InternalID", (object)demographicApprovedAssociates.InternalID ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@From", (object)demographicApprovedAssociates.From ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@To", (object)demographicApprovedAssociates.To ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ProcedureAuthorized", (object)demographicApprovedAssociates.ProcedureAuthorized ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Comment", (object)demographicApprovedAssociates.Comment ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Active", (object)demographicApprovedAssociates.Active ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@HideFromHub", (object)demographicApprovedAssociates.HideFromHub ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@HideFromHubReason", (object)demographicApprovedAssociates.HideFromHubReason ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Document1", (object)demographicApprovedAssociates.Document1 ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Primary", (object)demographicApprovedAssociates.Primary ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Alternate", (object)demographicApprovedAssociates.Alternate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Id", (object)demographicEducations.Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Dr_Id", (object)demographicEducations.Dr_Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Type_Code", (object)demographicEducations.Type_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Institution_Code", (object)demographicEducations.Institution_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Facility_Code", (object)demographicEducations.Facility_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FromDate", (object)demographicEducations.FromDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ToDate", (object)demographicEducations.ToDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Degree_Code", (object)demographicEducations.Degree_Code ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Major", (object)demographicEducations.Major ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Honors", (object)demographicEducations.Honors ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ProgramType", (object)demographicEducations.ProgramType ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Speciality_Id", (object)demographicEducations.Speciality_Id ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ProgramCompleted", (object)demographicEducations.ProgramCompleted ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@AnticipatedCompletionDate", (object)demographicEducations.AnticipatedCompletionDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ForeignGraduate", (object)demographicEducations.ForeignGraduate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ECFMGCertified", (object)demographicEducations.ECFMGCertified ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ECFMGNumber", (object)demographicEducations.ECFMGNumber ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ECFMGIssueDate", (object)demographicEducations.ECFMGIssueDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DirectorFirstName", (object)demographicEducations.DirectorFirstName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DirectorLastName", (object)demographicEducations.DirectorLastName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DirectorTitle", (object)demographicEducations.DirectorTitle ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DirectorSuffix", (object)demographicEducations.DirectorSuffix ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Comments", (object)demographicEducations.Comments ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Documents1", (object)demographicEducations.Documents1 ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Sequence", (object)demographicEducations.Sequence ?? DBNull.Value);
 
                     // Log each parameter value
                     foreach (SqlParameter param in cmd.Parameters)
